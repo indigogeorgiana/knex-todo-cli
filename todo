@@ -16,7 +16,7 @@ var note = process.argv[3]
 switch (cmd) {
   case 'add':
     addTodo(note, db)
-      .then(function () { return getAll(db) })
+      .then(refreshTodos)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -31,7 +31,7 @@ switch (cmd) {
 
   case 'done':
     deleteTodo(note, db)
-      .then(function () { return getAll(db) })
+      .then(refreshTodos)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -39,11 +39,16 @@ switch (cmd) {
 
   case 'update':
     updateTodo(note, process.argv[4], db)
-      .then(function () { return getAll(db) })
+      .then(refreshTodos)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
     break
+
+  case 'search':
+    searchTodos(note, db)
+      .then(refreshTodos)
+
 
   default:
     console.log('No matched cases')
@@ -59,6 +64,10 @@ function listTodos (todos) {
 
 function logError (err) {
   console.error('Uh oh!', err)
+}
+
+function refreshTodos () {
+  return getAll(db)
 }
 
 function getAll (connection) {
@@ -82,6 +91,11 @@ function updateTodo (id, task, connection) {
   return connection('todos')
     .where('id', id)
     .update({ task: task })
+}
+
+function searchTodos (search, connection) {
+  return connection('todos')
+    .where('task', 'like', '%' + search + '%')
 }
 
 function closeDB () {
