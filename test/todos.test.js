@@ -77,3 +77,13 @@ test('updateTodo alters the task', function (t) {
       t.is(actual, expected)
     })
 })
+
+test('searchTodos returns the correct todos', function (t) {
+  // Only ids 1 and 3 have a task with full-stops in it
+  var expected = [1, 3]
+  return todos.searchTodos('.', t.context.db)
+    .then(function (results) {
+      var actual = results.map(function (todo) { return todo.id })
+      t.deepEqual(actual, expected)
+    })
+})

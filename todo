@@ -4,6 +4,7 @@ module.exports = {
   addTodo: addTodo,
   deleteTodo: deleteTodo,
   getAll: getAll,
+  searchTodos: searchTodos,
   updateTodo: updateTodo
 }
 
@@ -47,8 +48,10 @@ switch (cmd) {
 
   case 'search':
     searchTodos(note, db)
-      .then(refreshTodos)
-
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
 
   default:
     console.log('No matched cases')
@@ -96,6 +99,7 @@ function updateTodo (id, task, connection) {
 function searchTodos (search, connection) {
   return connection('todos')
     .where('task', 'like', '%' + search + '%')
+    .select()
 }
 
 function closeDB () {
