@@ -55,14 +55,24 @@ test('addTodo creates a new todo', function (t) {
     })
 })
 
+test('completeTodo completes the correct todo', function (t) {
+  var id = 2
+  return todos.completeTodo(id, t.context.db)
+    .then(function () { return t.context.db('todos').where('id', id).select() })
+    .then(function (results) {
+      t.truthy(results[0].completed)
+    })
+})
+
 test('deleteTodo removes the correct todo', function (t) {
   var id = 2
+  var expected = 0
 
   return todos.deleteTodo(id, t.context.db)
-    .then(function () { return t.context.db('todos').select() })
+    .then(function () { return t.context.db('todos').where('id', id).select() })
     .then(function (results) {
-      var found = results.find(function (todo) { return todo.id === id })
-      t.falsy(found)
+      var actual = results.length
+      t.is(actual, expected)
     })
 })
 
