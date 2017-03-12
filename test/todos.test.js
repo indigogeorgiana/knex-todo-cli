@@ -65,3 +65,15 @@ test('deleteTodo removes the correct todo', function (t) {
       t.falsy(found)
     })
 })
+
+test('updateTodo alters the task', function (t) {
+  var id = 2
+  var expected = '!!!'
+
+  return todos.updateTodo(id, expected, t.context.db)
+    .then(function () { return t.context.db('todos').select() })
+    .then(function (results) {
+      var actual = results.find(function (todo) { return todo.id === id }).task
+      t.is(actual, expected)
+    })
+})

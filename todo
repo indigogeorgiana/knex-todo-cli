@@ -3,7 +3,8 @@
 module.exports = {
   addTodo: addTodo,
   deleteTodo: deleteTodo,
-  getAll: getAll
+  getAll: getAll,
+  updateTodo: updateTodo
 }
 
 var config = require('./knexfile').development
@@ -30,9 +31,16 @@ switch (cmd) {
 
   case 'done':
     deleteTodo(note, db)
-      .then(function () {
-        console.info('Task ' + id + ' is complete!')
-      })
+      .then(function () { return getAll(db) })
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    updateTodo(note, process.argv[4], db)
+      .then(function () { return getAll(db) })
+      .then(listTodos)
       .catch(logError)
       .finally(closeDB)
     break
@@ -68,6 +76,12 @@ function deleteTodo (id, connection) {
   return connection('todos')
     .where('id', id)
     .delete()
+}
+
+function updateTodo (id, task, connection) {
+  return connection('todos')
+    .where('id', id)
+    .update({ task: task })
 }
 
 function closeDB () {
