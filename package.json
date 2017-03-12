@@ -15,7 +15,8 @@
   },
   "scripts": {
     "knex": "knex",
-    "test": "ava"
+    "test": "ava",
+    "test:watch": "ava --watch"
   },
   "repository": {
     "type": "git",

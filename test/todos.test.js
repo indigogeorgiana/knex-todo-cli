@@ -43,3 +43,25 @@ test('getAll returns three todos', function (t) {
       t.is(actual, expected)
     })
 })
+
+test('addTodo creates a new todo', function (t) {
+  var expected = 4
+
+  return todos.addTodo('Yup.', t.context.db)
+    .then(function () { return t.context.db('todos').select() })
+    .then(function (results) {
+      var actual = results.length
+      t.is(actual, expected)
+    })
+})
+
+test('deleteTodo removes the correct todo', function (t) {
+  var id = 2
+
+  return todos.deleteTodo(id, t.context.db)
+    .then(function () { return t.context.db('todos').select() })
+    .then(function (results) {
+      var found = results.find(function (todo) { return todo.id === id })
+      t.falsy(found)
+    })
+})

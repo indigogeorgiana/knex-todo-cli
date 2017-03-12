@@ -2,6 +2,7 @@
 
 module.exports = {
   addTodo: addTodo,
+  deleteTodo: deleteTodo,
   getAll: getAll
 }
 
@@ -27,6 +28,15 @@ switch (cmd) {
       .finally(closeDB)
     break
 
+  case 'done':
+    deleteTodo(note, db)
+      .then(function () {
+        console.info('Task ' + id + ' is complete!')
+      })
+      .catch(logError)
+      .finally(closeDB)
+    break
+
   default:
     console.log('No matched cases')
     closeDB()
@@ -35,7 +45,7 @@ switch (cmd) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.task)
+    console.info(todo.id + ': ' + todo.task)
   })
 }
 
@@ -52,6 +62,12 @@ function addTodo (task, connection) {
     .insert({
       task: task
     })
+}
+
+function deleteTodo (id, connection) {
+  return connection('todos')
+    .where('id', id)
+    .delete()
 }
 
 function closeDB () {
