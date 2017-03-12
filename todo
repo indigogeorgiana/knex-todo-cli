@@ -37,6 +37,7 @@ switch (cmd) {
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
+    break
 
   case 'delete':
     deleteTodo(note, db)
