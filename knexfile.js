@@ -1,8 +1,7 @@
 // Update with your config settings.
 
 module.exports = {
-
-  development: {
+  dev: {
     client: 'sqlite3',
     connection: {
       filename: './dev.sqlite3'
@@ -10,10 +9,18 @@ module.exports = {
     useNullAsDefault: true
   },
 
-  test: {
-    client: 'sqlite3',
+  development: {
+    client: 'pg',
     connection: {
-      filename: ':memory:'
+      database: 'knex-todo-dev'
+    },
+    useNullAsDefault: true
+  },
+
+  test: {
+    client: 'pg',
+    connection: {
+      database: 'knex-todo-test'
     },
     seeds: {
       directory: './test/helpers/seeds'

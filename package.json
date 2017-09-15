@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "knex": "^0.12.7",
+    "pg": "^7.3.0",
     "sqlite3": "^3.1.8"
   },
   "devDependencies": {
@@ -15,7 +16,7 @@
   },
   "scripts": {
     "knex": "knex",
-    "test": "ava",
+    "test": "ava --serial",
     "test:watch": "ava --watch"
   },
   "repository": {

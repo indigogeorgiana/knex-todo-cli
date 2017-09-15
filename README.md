@@ -1,3 +1,5 @@
+NOTE: this branch is an example of migrating from sqlite to postgres - checkout [this video](https://youtu.be/Njfp2UQQl1I) for more information.
+
 # knex-todo-cli
 
 Command-line todo app using Knex.

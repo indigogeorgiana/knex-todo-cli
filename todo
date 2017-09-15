@@ -91,7 +91,7 @@ function addTodo (task, connection) {
   return connection('todos')
     .insert({
       task: task
-    })
+    }, 'id')
 }
 
 function completeTodo (id, connection) {
