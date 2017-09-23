@@ -5,11 +5,19 @@ var db = require('knex')(config)
 
 var cmd = process.argv[2]
 var note = process.argv[3]
+var task = process.argv[4]
 
 switch (cmd) {
   case 'add':
     addTodo(note)
       .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'search':
+    find(note)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -22,15 +30,49 @@ switch (cmd) {
       .finally(closeDB)
     break
 
+  case 'done':
+    completeTodo(note)
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    updateTodo(note, task)
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
   default:
     console.log('No matched cases')
     closeDB()
     break
 }
 
+function completeTodo (id) {
+  return db('todos')
+    .where('id', id)
+    .del()
+}
+
+function updateTodo (id, task) {
+  return db('todos')
+    .where('id', id)
+    .update({task: task})
+}
+
+function find (note) {
+  return db('todos')
+    .where('task', 'like', '%'+note+'%')
+    .select()
+}
+
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.task)
+    console.info(todo.id + ':', todo.task)
   })
 }
 

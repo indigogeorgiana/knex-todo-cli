@@ -1,0 +1,31 @@
+{
+  "name": "knex-todo-cli",
+  "version": "1.0.0",
+  "description": "Command-line todo app using knex",
+  "main": "index.js",
+  "dependencies": {
+    "knex": "^0.12.6",
+    "sqlite3": "^3.1.8"
+  },
+  "devDependencies": {
+    "devtool": "^2.3.0",
+    "tap-diff": "^0.1.1",
+    "tape": "^4.6.3"
+  },
+  "scripts": {
+    "knex": "knex",
+    "debug": "devtool",
+    "test": "tape tests/**/*-test.js | tap-diff"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-academy-challenges/knex-todo-cli.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dev-academy-challenges/knex-todo-cli/issues"
+  },
+  "homepage": "https://github.com/dev-academy-challenges/knex-todo-cli#readme"
+}
