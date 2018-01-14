@@ -16,7 +16,7 @@ module.exports = {
       filename: ':memory:'
     },
     seeds: {
-      directory: './test/seeds'
+      directory: './tests/seeds'
     },
     useNullAsDefault: true
   },
