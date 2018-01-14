@@ -1,7 +1,16 @@
 #!/usr/bin/env node
 
+module.exports = {
+  addTodo: addTodo,
+  completeTodo: completeTodo,
+  deleteTodo: deleteTodo,
+  getAll: getAll,
+  searchTodos: searchTodos,
+  updateTodo: updateTodo
+}
+
 var config = require('./knexfile').development
-var db = require('knex')(config)
+var devDb = require('knex')(config)
 
 var cmd = process.argv[2]
 var note = process.argv[3]
@@ -10,7 +19,7 @@ var task = process.argv[4]
 switch (cmd) {
   case 'add':
     addTodo(note)
-      .then(getAll)
+      .then(refreshTodos)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -25,6 +34,37 @@ switch (cmd) {
 
   case 'list':
     getAll()
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'done':
+    completeTodo(note)
+      .then(refreshTodos)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'delete':
+    deleteTodo(note)
+      .then(refreshTodos)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    updateTodo(note, process.argv[4])
+      .then(refreshTodos)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'search':
+    searchTodos(note)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -52,19 +92,22 @@ switch (cmd) {
     break
 }
 
-function completeTodo (id) {
+function completeTodo (id, testDb) {
+  const db = testDb || devDb
   return db('todos')
     .where('id', id)
     .del()
 }
 
-function updateTodo (id, task) {
+function updateTodo (id, task, testDb) {
+  const db = testDb || devDb
   return db('todos')
     .where('id', id)
     .update({task: task})
 }
 
-function find (note) {
+function find (note, testDb) {
+  const db = testDb || devDb
   return db('todos')
     .where('task', 'like', '%'+note+'%')
     .select()
@@ -72,7 +115,8 @@ function find (note) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.id + ':', todo.task)
+    var completed = todo.completed ? ' (completed)' : ''
+    console.info(todo.id + ': ' + todo.task + completed)
   })
 }
 
@@ -80,17 +124,53 @@ function logError (err) {
   console.error('Uh oh!', err)
 }
 
-function getAll () {
+function refreshTodos () {
+  return getAll()
+}
+
+function getAll (testDb) {
+  const db = testDb || devDb
   return db('todos').select()
 }
 
-function addTodo (task) {
+function addTodo (task, testDb) {
+  const db = testDb || devDb
   return db('todos')
     .insert({
       task: task
     })
 }
 
-function closeDB () {
+function completeTodo (id, testDb) {
+  const db = testDb || devDb
+  return db('todos')
+    .where('id', id)
+    .update({ completed: true })
+}
+
+function deleteTodo (id, testDb) {
+  const db = testDb || devDb
+  return db('todos')
+    .where('id', id)
+    .delete()
+}
+
+function updateTodo (id, task, testDb) {
+  const db = testDb || devDb
+  return db('todos')
+    .where('id', id)
+    .update({ task: task })
+}
+
+function searchTodos (search, testDb) {
+  const db = testDb || devDb
+  return db('todos')
+    .where('task', 'like', '%' + search + '%')
+    .select()
+}
+
+function closeDB (testDb) {
+  const db = testDb || devDb
   db.destroy()
 }
+

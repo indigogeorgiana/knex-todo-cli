@@ -1,6 +1,6 @@
-exports.seed = function (knex) {
+exports.seed = knex => {
   return knex('todos').del()
-    .then(function () {
+    .then(() => {
       return knex('todos').insert([
         {id: 1, task: 'Acquire wombats.'},
         {id: 2, task: '???'},
