@@ -5,10 +5,31 @@ const devDb = require('knex')(config)
 
 const cmd = process.argv[2]
 const note = process.argv[3]
+const change = process.argv[4]
 
 switch (cmd) {
   case 'list':
     getAll()
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+  case 'done':
+    deleteTodo(note)
+      .then(() => getAll())
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+  case 'update':
+    updateTodo(change)
+      .then(() => getAll())
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+  case 'search':
+    searchTodo(note)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -22,8 +43,29 @@ switch (cmd) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.task)
+    console.info(todo.id + ':' + todo.task)
   })
+}
+
+function deleteTodo (todoId) {
+  const db = devDb
+  return db('todos')
+    .where('id', note)
+    .del()
+}
+
+function updateTodo (change) {
+  const db = devDb
+  return db('todos')
+    .where('id', note)
+    .update('task', change)
+}
+
+function searchTodo (note) {
+  const db = devDb
+  return db('todos')
+    .where('id', note)
+    .select()
 }
 
 function logError (err) {
