@@ -38,8 +38,16 @@ switch (cmd) {
       .finally(closeDB)
     break
 
-  case 'completed':
-    completed()
+  case 'complete':
+    complete()
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'incomplete':
+    incomplete()
       .then(getAll)
       .then(listTodos)
       .catch(logError)
@@ -101,11 +109,20 @@ function closeDB (testDb) {
 //   })
 // }
 
-function completed () {
+function complete () {
   return devDb('todos')
     .where('id', note)
     .select()
     .update(
       'completed', true
+    )
+}
+
+function incomplete () {
+  return devDb('todos')
+    .where('id', note)
+    .select()
+    .update(
+      'completed', false
     )
 }
