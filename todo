@@ -4,12 +4,60 @@ const config = require('./knexfile').development
 const devDb = require('knex')(config)
 
 const cmd = process.argv[2]
-const note = process.argv[3]
+// const note = process.argv[3]
+// const input = process.argv[4]
 
 switch (cmd) {
   case 'list':
     getAll()
       .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'done':
+
+    deleteRow(process.argv[3])
+      .then(getAll)
+      .then(displayResult)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    updateRow(process.argv[3], process.argv[4])
+      .then(search)
+      .then(displayResult)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'search':
+    getAll()
+      .then(search)
+      .then(displayResult)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'complete':
+    completed(process.argv[3])
+      .then(search)
+      .then(displayResult)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'filter':
+    filter(process.argv[3])
+      .then(displayResult)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'sort':
+    sort(process.argv[3])
+      .then(displayResult)
       .catch(logError)
       .finally(closeDB)
     break
@@ -22,7 +70,7 @@ switch (cmd) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.task)
+    console.info(`${todo.id}: ${todo.task}`)
   })
 }
 
@@ -30,12 +78,60 @@ function logError (err) {
   console.error('Uh oh!', err)
 }
 
-function getAll (testDb) {
-  const db = testDb || devDb
-  return db('todos').select()
+function getAll () {
+  return devDb('todos').select()
 }
 
-function closeDB (testDb) {
-  const db = testDb || devDb
-  db.destroy()
+function closeDB () {
+  devDb.destroy()
+}
+
+function deleteRow (input) {
+  return devDb('todos')
+    .where('id', input)
+    .del()
+}
+
+function updateRow (id, input) {
+  return devDb('todos')
+    .where('id', id)
+    .update({
+      task: input
+    })
+}
+
+function search (id) {
+  return devDb('todos')
+    .where('id', id)
+    .select()
+}
+
+function displayResult (result) {
+  console.log(result)
+}
+
+function completed (input) {
+  return devDb('todos')
+    .where('task', input)
+    .select()
+    .update({
+      completed: true
+    })
+}
+
+function filter (input) {
+  if (input === 'completed') {
+    return devDb('todos')
+      .where('completed', 1)
+      .select()
+  } else if (input === 'incomplete') {
+    return devDb('todos')
+      .where('completed', 0)
+      .select()
+  }
+}
+
+function sort (input) {
+  return devDb('todos')
+    .orderBy(input, 'desc')
 }
