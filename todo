@@ -5,10 +5,34 @@ const devDb = require('knex')(config)
 
 const cmd = process.argv[2]
 const note = process.argv[3]
+const string = process.argv[4]
 
 switch (cmd) {
   case 'list':
-    getAll()
+    getAll(note)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'remove':
+    remove(note)
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    update(note, string)
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'search':
+    search(note)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -18,6 +42,13 @@ switch (cmd) {
     console.log('No matched cases')
     closeDB()
     break
+}
+
+function search (note) {
+  const db = devDb
+  return db('todos')
+    .where('task', note)
+    .select()
 }
 
 function listTodos (todos) {
@@ -30,9 +61,24 @@ function logError (err) {
   console.error('Uh oh!', err)
 }
 
-function getAll (testDb) {
+function remove (note, testDb) {
   const db = testDb || devDb
-  return db('todos').select()
+  return db('todos')
+    .where('id', note)
+    .delete()
+}
+
+function update (note, newStr) {
+  const db = devDb
+  return db('todos')
+    .where('id', note)
+    .update('task', newStr)
+}
+
+function getAll (testDb) {
+  const db = devDb
+  return db('todos')
+    .select()
 }
 
 function closeDB (testDb) {
