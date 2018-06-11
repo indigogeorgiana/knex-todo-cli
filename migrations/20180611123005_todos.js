@@ -3,6 +3,8 @@ exports.up = (knex, Promise) => {
   return knex.schema.createTable('todos', table => {
     table.increments('id')
     table.string('task')
+    table.string('completed')
+    table.string('priority')
   })
 }
 
