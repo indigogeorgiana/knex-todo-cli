@@ -85,3 +85,8 @@ function closeDB (testDb) {
   const db = testDb || devDb
   db.destroy()
 }
+
+function migration (note) {
+  const db = devDb
+  return dB('todos')
+}
