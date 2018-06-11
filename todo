@@ -7,7 +7,7 @@ const cmd = process.argv[2]
 const note = process.argv[3]
 const task = process.argv[4]
 
-console.log(note)
+// console.log(note)
 
 switch (cmd) {
   case 'list':
@@ -38,6 +38,29 @@ switch (cmd) {
       .finally(closeDB)
     break
 
+  case 'search':
+    getAll()
+      .then(search)
+      .then(showSearch)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'complete':
+    getAll()
+      .then(complete)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'completed':
+    getAll()
+      .then(completedOnly)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
   default:
     console.log('No matched cases')
     closeDB()
@@ -46,7 +69,7 @@ switch (cmd) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.id + ': ' + todo.task)
+    console.info(todo.id + ': ' + todo.task + ' ' + todo.completed)
   })
 }
 
@@ -60,7 +83,6 @@ function getAll (testDb) {
 }
 
 function delById (todos) {
-  // const db = todos || devDb
   return devDb('todos').where('id', note).del()
 }
 
@@ -74,6 +96,23 @@ function insertData (todos) {
 
 function updateTask (todos) {
   return devDb('todos').where('id', note).update('task', task)
+}
+
+function search (todos) {
+  const x = devDb.select('task').from('todos').where('task', 'like', '%' + note + '%')
+  return x
+}
+
+function showSearch (x) {
+  console.log(x)
+}
+
+function complete (todos) { // user enters ./todo complete 1 and functions adds 'Y' to completed column
+  return devDb('todos').where('id', note).update('completed', 'Y')
+}
+
+function completedOnly (todos) {
+  return devDb.select('id', 'task', 'completed').from('todos').where('completed', 'Y')
 }
 
 function closeDB (testDb) {
