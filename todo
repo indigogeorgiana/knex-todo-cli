@@ -38,6 +38,14 @@ switch (cmd) {
       .finally(closeDB)
     break
 
+  case 'completed':
+    completed()
+      .then(getAll)
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
   default:
     console.log('No matched cases')
     closeDB()
@@ -86,7 +94,18 @@ function closeDB (testDb) {
   db.destroy()
 }
 
-function migration (note) {
-  const db = devDb
-  return dB('todos')
+// function fillcompleted (note) {
+//   note.forEach(function () {
+//     devDb('todos')
+//       .update('completed', false)
+//   })
+// }
+
+function completed () {
+  return devDb('todos')
+    .where('id', note)
+    .select()
+    .update(
+      'completed', true
+    )
 }

@@ -1,7 +1,7 @@
 
 exports.up = function (knex, Promise) {
   return knex.schema.table('todos', table => {
-    table.string('completed')
+    table.boolean('completed', true)
   })
 }
 
