@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+const knex = require('knex')
 
 const config = require('./knexfile').development
 const devDb = require('knex')(config)
@@ -10,6 +11,22 @@ switch (cmd) {
   case 'list':
     getAll()
       .then(listTodos)
+      // .catch(logError)
+      // .finally(closeDB)
+    break
+
+  case 'done' :
+    deleteTask(note)
+      .then(() => getAll())
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'update':
+    updateTask(note)
+      .then(() => getAll())
+      .then(listTodos)
       .catch(logError)
       .finally(closeDB)
     break
@@ -20,10 +37,18 @@ switch (cmd) {
     break
 }
 
+function updateTask (id, task) {
+  const db = devDb
+  return db('todos')
+    .where('id', id)
+    .update({task: task})
+}
+
 function listTodos (todos) {
-  todos.forEach(function (todo) {
-    console.info(todo.task)
+  todos.forEach(t => {
+    console.info(`${t.id}: ${t.task}`)
   })
+  devDb.destroy()
 }
 
 function logError (err) {
@@ -39,3 +64,24 @@ function closeDB (testDb) {
   const db = testDb || devDb
   db.destroy()
 }
+
+function deleteTask (id) {
+  // returns a promise that can delete a row given its id
+  const db = devDb
+  return db('todos')
+    .where('id', id)
+    .del()
+}
+
+//   return db('todos')
+//         .del()
+//         .where('id'.id)
+
+// }
+
+// //update task by id
+// function updateList (id, task, db) {
+//   return db('todos')
+//     .where('id'.id)
+//     .update({task: task})
+// }
