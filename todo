@@ -6,6 +6,7 @@ const devDb = require('knex')(config)
 
 const cmd = process.argv[2]
 const note = process.argv[3]
+const next = process.argv[4]
 
 switch (cmd) {
   case 'list':
@@ -23,9 +24,16 @@ switch (cmd) {
       .finally(closeDB)
     break
 
-  case 'update':
-    updateTask(note)
+  case 'update' :
+    updateTask(note, next)
       .then(() => getAll())
+      .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'search' :
+    searchData(note)
       .then(listTodos)
       .catch(logError)
       .finally(closeDB)
@@ -35,13 +43,6 @@ switch (cmd) {
     console.log('No matched cases')
     closeDB()
     break
-}
-
-function updateTask (id, task) {
-  const db = devDb
-  return db('todos')
-    .where('id', id)
-    .update({task: task})
 }
 
 function listTodos (todos) {
@@ -73,15 +74,16 @@ function deleteTask (id) {
     .del()
 }
 
-//   return db('todos')
-//         .del()
-//         .where('id'.id)
+function updateTask (id, next) {
+  const db = devDb
+  return db('todos')
+    .where('id', id)
+    .update('task', next)
+}
 
-// }
-
-// //update task by id
-// function updateList (id, task, db) {
-//   return db('todos')
-//     .where('id'.id)
-//     .update({task: task})
-// }
+function searchData (note) {
+  const db = devDb
+  return db('todos')
+    .where('id', note)
+    .select()
+}
