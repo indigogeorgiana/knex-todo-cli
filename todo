@@ -5,11 +5,35 @@ const devDb = require('knex')(config)
 
 const cmd = process.argv[2]
 const note = process.argv[3]
+const task = process.argv[4]
+
+console.log(note)
 
 switch (cmd) {
   case 'list':
     getAll()
       .then(listTodos)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'done':
+    getAll()
+      .then(delById)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'insert':
+    getAll()
+      .then(insertData)
+      .catch(logError)
+      .finally(closeDB)
+    break
+
+  case 'updateTask':
+    getAll()
+      .then(updateTask)
       .catch(logError)
       .finally(closeDB)
     break
@@ -22,7 +46,7 @@ switch (cmd) {
 
 function listTodos (todos) {
   todos.forEach(function (todo) {
-    console.info(todo.task)
+    console.info(todo.id + ': ' + todo.task)
   })
 }
 
@@ -33,6 +57,23 @@ function logError (err) {
 function getAll (testDb) {
   const db = testDb || devDb
   return db('todos').select()
+}
+
+function delById (todos) {
+  // const db = todos || devDb
+  return devDb('todos').where('id', note).del()
+}
+
+function insertData (todos) {
+  return devDb('todos').insert([
+    {id: 1, task: 'eat breakfast'},
+    {id: 2, task: 'brush teeth'},
+    {id: 3, task: 'have a shower'}
+  ])
+}
+
+function updateTask (todos) {
+  return devDb('todos').where('id', note).update('task', task)
 }
 
 function closeDB (testDb) {
